@@ -3,6 +3,7 @@
     "name": "myklan-v1",
     "slug": "myklan-v1",
     "version": "1.0.0",
+    "scheme": "myklan",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,6 +23,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
   }
 }
