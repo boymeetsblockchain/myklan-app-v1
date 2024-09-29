@@ -6,7 +6,5 @@ export function useGetMyPosts (){
     return useQuery({
         queryKey: ["myposts"],
         queryFn: getMyPosts,
-        refetchOnMount: "always",   
-        refetchOnWindowFocus: true,  
       });
 }

@@ -1,19 +1,27 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { View, Text, Pressable, Image, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import { TextWrapper, TextWrapperWhite } from "../../components/textwrapper";
 import { SafeViewComponent } from "../../components/safeview";
 import { useGetUserByUsername } from "../../services/user/queries";
-import { ActivityIndicator } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import tw from "twrnc";
 import { ProfilePosts } from "../../components/profile/ProfilePost";
+
 export default function Creator() {
   const params = useLocalSearchParams();
   const username = params.username ? String(params.username) : "";
   const { data: profile, isLoading, error } = useGetUserByUsername(username);
 
+  // Check for loading state
   if (isLoading) {
     return (
       <ActivityIndicator
@@ -23,15 +31,15 @@ export default function Creator() {
       />
     );
   }
-  // Convert date to a more readable format
-  const formatDate = (dateString: Date | string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+
+  // Check for errors
+  if (error) {
+    console.error("Error fetching profile:", error);
+    return <Text>Error loading profile</Text>;
+  }
+
+  // Log profile updates data
+  console.log("Profile Updates Data:", profile?.updates.data);
 
   return (
     <View style={tw`bg-white flex-1`}>
@@ -106,10 +114,10 @@ export default function Creator() {
             {/* Member Since */}
             <View style={tw`flex-row items-center gap-x-2 mt-2`}>
               <FontAwesome5 name="calendar-alt" size={20} color="black" />
-
               {profile?.user.date && (
                 <TextWrapper style={tw`text-base`}>
-                  Member since {formatDate(profile?.user.date)}
+                  Member since{" "}
+                  {new Date(profile.user.date).toLocaleDateString()}
                 </TextWrapper>
               )}
             </View>
@@ -120,20 +128,26 @@ export default function Creator() {
             </TextWrapper>
           </View>
         </View>
-        <View style={tw`flex-1`}>
+      </View>
+
+      <View style={tw`flex-1`}>
+        {/* Check if updates.data is present and has items */}
+        {profile?.updates.data && profile.updates.data.length > 0 ? (
           <FlatList
-            data={profile?.updates.data}
+            data={profile.updates.data}
             renderItem={({ item }) => (
               <ProfilePosts
                 post={item}
-                avatar={profile?.user.avatar as string}
-                username={profile?.user.username as string}
+                avatar={profile?.user.avatar}
+                username={profile?.user.username}
               />
             )}
             keyExtractor={(item) => item.id.toString()}
             ItemSeparatorComponent={() => <View style={tw`h-6`} />}
           />
-        </View>
+        ) : (
+          <Text>No posts available</Text>
+        )}
       </View>
     </View>
   );

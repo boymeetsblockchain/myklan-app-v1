@@ -69,15 +69,7 @@ export default function DrawerLayout() {
           ),
         }}
       />
-      <Drawer.Screen
-        name="balance"
-        options={{
-          title: "Balance",
-          drawerIcon: ({ color, size }: { color: string; size: number }) => (
-            <Icon name="cash-outline" color={color} size={24} />
-          ),
-        }}
-      />
+
       <Drawer.Screen
         name="subscribers"
         options={{
@@ -93,15 +85,6 @@ export default function DrawerLayout() {
           title: "My Subscriptions",
           drawerIcon: ({ color, size }: { color: string; size: number }) => (
             <Icon name="list-outline" color={color} size={24} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="purchased"
-        options={{
-          title: "Purchased",
-          drawerIcon: ({ color, size }: { color: string; size: number }) => (
-            <Icon name="cart-outline" color={color} size={24} />
           ),
         }}
       />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeViewComponent } from "../../components/safeview";
 import { useGetUser } from "../../services/user/queries";
 import { AntDesign } from "@expo/vector-icons";
@@ -7,12 +7,19 @@ import tw from "twrnc";
 import { TextWrapper } from "../../components/textwrapper";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as DocumentPicker from "expo-document-picker";
+
+interface User {
+  avatar: string;
+  username: string;
+}
 
 export default function PostPage() {
   const { data: user } = useGetUser();
-  const [postContent, setPostContent] = useState("");
-  const [postTitle, setPostTitle] = useState("");
-  const [postPrice, setPostPrice] = useState("");
+  const [postContent, setPostContent] = useState<string>("");
+  const [postTitle, setPostTitle] = useState<string>("");
+  const [postPrice, setPostPrice] = useState<string>("");
+  const [selectedZip, setSelectedZip] = useState<string | null>(null); // State for selected zip file
 
   const handlePostSubmit = async () => {
     // Check for post content
@@ -22,19 +29,25 @@ export default function PostPage() {
     }
 
     try {
-      // Retrieve the auth token from AsyncStorage
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
         throw new Error("No auth token found");
       }
 
-      // Create FormData to include the post details
       const formData = new FormData();
       formData.append("title", postTitle);
       formData.append("description", postContent);
-      formData.append("price", String(postPrice));
+      formData.append("price", String(postPrice)); // Convert price to a string
 
-      // Send the POST request
+      // Include the selected zip file if available
+      if (selectedZip) {
+        formData.append("zip", {
+          uri: selectedZip,
+          type: "application/zip", // Adjust according to your needs
+          name: selectedZip.split("/").pop() || "file.zip", // Default filename
+        } as any); // Type assertion since FormData expects 'any'
+      }
+
       const response = await axios.post(
         "https://api.myklan.africa/public/api/post",
         formData,
@@ -46,7 +59,6 @@ export default function PostPage() {
         }
       );
 
-      // Check for successful response
       if (response.status === 200) {
         alert("Success! Your post has been created.");
       } else {
@@ -54,7 +66,6 @@ export default function PostPage() {
       }
     } catch (err: any) {
       console.error(err);
-      // Display a user-friendly error message
       alert(
         "An error occurred: " +
           (err.response?.data?.message ||
@@ -64,19 +75,30 @@ export default function PostPage() {
     }
   };
 
+  const handleZipPicker = async () => {
+    // Launch the document picker for zip files
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "application/zip",
+      copyToCacheDirectory: true, // Optional: copy to cache for better performance
+    });
+
+    // Check if the user cancelled the picker
+    if (result.type === "cancel") {
+      console.log("User cancelled document picker");
+      return;
+    }
+
+    // Set the selected zip file URI
+    setSelectedZip(result.uri);
+  };
+
   return (
     <SafeViewComponent>
       <View style={tw`p-4 bg-white flex-1`}>
         {/* Header */}
         <View style={tw`flex-row items-center mb-4`}>
-          <Image
-            source={{
-              uri: `https://myklan.africa/public/uploads/avatar/${user?.avatar}`,
-            }}
-            style={tw`w-12 h-12 rounded-full`}
-          />
-          <TextWrapper style={tw`ml-4text-gray-800`}>
-            {user?.username}
+          <TextWrapper style={tw`ml-4 text-gray-800`}>
+            {user?.username || "User"}
           </TextWrapper>
         </View>
 
@@ -90,16 +112,31 @@ export default function PostPage() {
         />
 
         {/* Post Content Input */}
-        <View style={tw``}>
-          <TextInput
-            placeholder="What's on your mind?"
-            placeholderTextColor="gray"
-            value={postContent}
-            onChangeText={(text) => setPostContent(text)}
-            multiline
-            style={tw`text-lg text-gray-900 p-4 bg-gray-100 rounded-lg h-20  mb-4`}
-          />
-        </View>
+        <TextInput
+          placeholder="What's on your mind?"
+          placeholderTextColor="gray"
+          value={postContent}
+          onChangeText={(text) => setPostContent(text)}
+          multiline
+          style={tw`text-lg text-gray-900 p-4 bg-gray-100 rounded-lg h-20 mb-4`}
+        />
+
+        {/* Select Zip File Button */}
+        <TouchableOpacity
+          onPress={handleZipPicker}
+          style={tw`bg-gray-200 p-3 rounded-lg mb-4`}
+        >
+          <Text style={tw`text-center text-gray-700`}>
+            {selectedZip ? "Change Zip File" : "Select Zip File"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Display Selected Zip File */}
+        {selectedZip && (
+          <Text style={tw`text-gray-700 mb-4`}>
+            Selected Zip: {selectedZip.split("/").pop()}
+          </Text>
+        )}
 
         {/* Post Price Input */}
         <TextInput
@@ -118,7 +155,7 @@ export default function PostPage() {
         >
           <AntDesign name="check" size={20} color="white" />
           <TextWrapper
-            style={tw`ml-2 text-white `}
+            style={tw`ml-2 text-white`}
             fontWeight="bold"
             textSize="lg"
           >

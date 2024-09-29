@@ -15,6 +15,7 @@
     "axios": "^1.7.7",
     "expo": "~51.0.28",
     "expo-app-loading": "^2.1.1",
+    "expo-blur": "~13.0.2",
     "expo-constants": "~16.0.2",
     "expo-font": "~12.0.10",
     "expo-image-picker": "~15.0.7",
@@ -26,6 +27,7 @@
     "react-hook-form": "^7.53.0",
     "react-native": "0.74.5",
     "react-native-gesture-handler": "~2.16.1",
+    "react-native-image-picker": "^7.1.2",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-modal": "^13.0.1",
     "react-native-reanimated": "~3.10.1",
@@ -34,7 +36,8 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
     "twrnc": "^4.5.1",
-    "undefined": "@types/react-native-vector-icons`"
+    "undefined": "@types/react-native-vector-icons`",
+    "expo-document-picker": "~12.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

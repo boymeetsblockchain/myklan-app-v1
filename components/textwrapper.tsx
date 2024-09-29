@@ -16,68 +16,87 @@ const sizePresets = {
   "2xl": 24,
 };
 
-export const TextWrapper = ({
-  children,
-  fontWeight = "regular",
-  textSize = "base",
-  style,
-  ...props
-}: TextWrapperComponentProps) => {
-  const getFontFamily = () => {
-    switch (fontWeight) {
-      case "bold":
-        return "Poppins-Bold";
-      case "extraBold":
-        return "Poppins-ExtraBold";
-      default:
-        return "Poppins-Regular";
-    }
-  };
+// TextWrapper with React.forwardRef
+export const TextWrapper = React.forwardRef<Text, TextWrapperComponentProps>(
+  (
+    { children, fontWeight = "regular", textSize = "base", style, ...props },
+    ref
+  ) => {
+    const getFontFamily = () => {
+      switch (fontWeight) {
+        case "bold":
+          return "Poppins-Bold";
+        case "extraBold":
+          return "Poppins-ExtraBold";
+        default:
+          return "Poppins-Regular";
+      }
+    };
 
-  const getFontSize = () => {
-    return sizePresets[textSize] || sizePresets.base;
-  };
+    const getFontSize = () => {
+      return sizePresets[textSize] || sizePresets.base;
+    };
 
-  return (
-    <Text
-      style={[{ fontFamily: getFontFamily(), fontSize: getFontSize() }, style]} // Use preset sizes
-      {...props}
-    >
-      {children}
-    </Text>
-  );
-};
+    return (
+      <Text
+        ref={ref} // forward the ref
+        style={[
+          { fontFamily: getFontFamily(), fontSize: getFontSize() },
+          style,
+        ]} // Use preset sizes
+        {...props}
+      >
+        {children}
+      </Text>
+    );
+  }
+);
 
-export const TextWrapperWhite = ({
-  children,
-  fontWeight = "regular",
-  textSize = "base",
-  style,
-  ...props
-}: TextWrapperComponentProps) => {
-  const getFontFamily = () => {
-    switch (fontWeight) {
-      case "bold":
-        return "Poppins-Bold";
-      case "extraBold":
-        return "Poppins-ExtraBold";
-      default:
-        return "Poppins-Regular";
-    }
-  };
-  const getFontSize = () => {
-    return sizePresets[textSize] || sizePresets.base;
-  };
+// For better debugging
+TextWrapper.displayName = "TextWrapper";
 
-  return (
-    <Text
-      style={[
-        { fontFamily: getFontFamily(), color: "#fff", fontSize: getFontSize() },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </Text>
-  );
-};
+// TextWrapperWhite with React.forwardRef
+export const TextWrapperWhite = React.forwardRef<
+  Text,
+  TextWrapperComponentProps
+>(
+  (
+    { children, fontWeight = "regular", textSize = "base", style, ...props },
+    ref
+  ) => {
+    const getFontFamily = () => {
+      switch (fontWeight) {
+        case "bold":
+          return "Poppins-Bold";
+        case "extraBold":
+          return "Poppins-ExtraBold";
+        default:
+          return "Poppins-Regular";
+      }
+    };
+
+    const getFontSize = () => {
+      return sizePresets[textSize] || sizePresets.base;
+    };
+
+    return (
+      <Text
+        ref={ref} // forward the ref
+        style={[
+          {
+            fontFamily: getFontFamily(),
+            color: "#fff",
+            fontSize: getFontSize(),
+          },
+          style,
+        ]}
+        {...props}
+      >
+        {children}
+      </Text>
+    );
+  }
+);
+
+// For better debugging
+TextWrapperWhite.displayName = "TextWrapperWhite";

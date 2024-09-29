@@ -29,7 +29,6 @@ export default function RootLayout() {
         await fetchFonts();
 
         setDataLoaded(true);
-
         await SplashScreen.hideAsync();
       } catch (error) {
         console.error(error);
@@ -39,9 +38,11 @@ export default function RootLayout() {
     prepareData();
   }, []);
 
+  // Return AppLoading if data is not loaded yet
   if (!dataLoaded) {
-    <AppLoading />;
+    return <AppLoading />;
   }
+
   return (
     <QueryClientProvider client={client}>
       <Slot />

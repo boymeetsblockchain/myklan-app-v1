@@ -1,18 +1,21 @@
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
-import { SafeViewComponent } from "../../../../components/safeview";
-import { FontAwesome5 } from "@expo/vector-icons";
-import {
-  TextWrapperWhite,
-  TextWrapper,
-} from "../../../../components/textwrapper";
+import React, { useState } from "react";
+import { View, TouchableOpacity, FlatList } from "react-native";
+import { BlurView } from "expo-blur";
 import AntDesign from "@expo/vector-icons/AntDesign";
+
+import {
+  TextWrapper,
+  TextWrapperWhite,
+} from "../../../../components/textwrapper";
 import tw from "twrnc";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useGetMyPosts } from "../../../../services/posts/queries";
 import { Post } from "../../../../components/post/Post";
+import IconMenu from "../../../../components/iconView";
 
 export default function Dashboard() {
   const { data: posts, isLoading, error } = useGetMyPosts();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Updated skeleton loader with colors matching the white background
   const renderSkeletonLoader = () => (
@@ -52,19 +55,20 @@ export default function Dashboard() {
   }
 
   return (
-    <View style={tw`flex-1 bg-white`}>
+    <View style={tw`flex-1`}>
       <FlatList
         data={posts}
         renderItem={({ item }) => <Post post={item} />}
         keyExtractor={(item) => item.id.toString()}
+        style={tw`z-0`}
       />
 
+      {/* Plus button with the IconMenu */}
       <TouchableOpacity
-        style={tw`absolute bottom-10 right-3 bg-black p-4 rounded-full`}
+        style={tw`absolute bottom-2 right-4 p-4  z-10`}
+        onPress={() => setIsMenuOpen((prev) => !prev)}
       >
-        <Link href={"/post"}>
-          <AntDesign name="plus" size={24} color="white" />
-        </Link>
+        <IconMenu />
       </TouchableOpacity>
     </View>
   );

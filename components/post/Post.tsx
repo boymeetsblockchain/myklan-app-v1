@@ -8,6 +8,7 @@ import { TextWrapper } from "../textwrapper";
 import IconButton from "./IconButton";
 import { TimeAgo } from "../timeago";
 import ImageViewer from "react-native-image-zoom-viewer"; // Assuming you have this package
+import { router } from "expo-router";
 
 export const Post = ({ post }: { post: PostProp }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -71,7 +72,10 @@ export const Post = ({ post }: { post: PostProp }) => {
           />
           <View style={tw`flex-row items-center flex-1`}>
             <View style={tw`flex flex-row items-center gap-x-3`}>
-              <TextWrapper style={tw`text-base font-semibold`}>
+              <TextWrapper
+                style={tw`text-base font-semibold`}
+                onPress={() => router.push(`profile/${post.creator.username}`)}
+              >
                 @{post.creator.username}
               </TextWrapper>
               <TextWrapper style={tw`text-gray-500`}>

@@ -97,7 +97,7 @@ export default function Home() {
               onPress={onSubmit}
             />
             <View style={tw`my-3 justify-between flex-row   items-center`}>
-              <Link href={"/password"}>
+              <Link href={"/auth/password"}>
                 <TextWrapper textSize="sm">Forgot Password ?</TextWrapper>
               </Link>
               <Link href={"/auth/register"}>

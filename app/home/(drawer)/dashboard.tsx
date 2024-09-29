@@ -36,13 +36,13 @@ export default function Dashboard() {
           <View>
             <TextWrapperWhite>Earnings This Month</TextWrapperWhite>
             <TextWrapperWhite style={tw``} fontWeight="bold" textSize="2xl">
-              ${dashboard?.stat_revenue_month}
+              {dashboard?.stat_revenue_month} Kowrys
             </TextWrapperWhite>
           </View>
           <View>
             <TextWrapperWhite>Active Subscriptions</TextWrapperWhite>
             <TextWrapperWhite style={tw``} fontWeight="bold" textSize="2xl">
-              {dashboard?.subscriptionsActive}
+              {dashboard?.subscriptionsActive} kowrys
             </TextWrapperWhite>
           </View>
         </View>
@@ -57,19 +57,19 @@ export default function Dashboard() {
           <View>
             <TextWrapperWhite>Today</TextWrapperWhite>
             <TextWrapperWhite textSize="lg" fontWeight="bold">
-              ${dashboard?.stat_revenue_today}
+              {dashboard?.stat_revenue_today} kowrys
             </TextWrapperWhite>
           </View>
           <View>
             <TextWrapperWhite>Yesterday</TextWrapperWhite>
             <TextWrapperWhite textSize="lg" fontWeight="bold">
-              ${dashboard?.stat_revenue_yesterday}
+              {dashboard?.stat_revenue_yesterday} kowrys
             </TextWrapperWhite>
           </View>
           <View>
             <TextWrapperWhite>This Week</TextWrapperWhite>
             <TextWrapperWhite textSize="lg" fontWeight="bold">
-              ${dashboard?.stat_revenue_week}
+              {dashboard?.stat_revenue_week} kowrys
             </TextWrapperWhite>
           </View>
         </View>
@@ -84,19 +84,19 @@ export default function Dashboard() {
           <View>
             <TextWrapperWhite>From Users</TextWrapperWhite>
             <TextWrapperWhite textSize="lg" fontWeight="bold">
-              ${dashboard?.earningNetUser}
+              {dashboard?.earningNetUser} kowrys
             </TextWrapperWhite>
           </View>
           <View>
             <TextWrapperWhite>From Subscriptions</TextWrapperWhite>
             <TextWrapperWhite textSize="lg" fontWeight="bold">
-              ${dashboard?.earningNetSubscriptions}
+              {dashboard?.earningNetSubscriptions} kowrys
             </TextWrapperWhite>
           </View>
           <View>
             <TextWrapperWhite>From Tips</TextWrapperWhite>
             <TextWrapperWhite textSize="lg" fontWeight="bold">
-              ${dashboard?.earningNetTips}
+              {dashboard?.earningNetTips}
             </TextWrapperWhite>
           </View>
         </View>
