@@ -42,13 +42,19 @@ export default function Dashboard() {
     return (
       <View style={tw`flex-1 items-center justify-center bg-white`}>
         <TextWrapper style={tw`text-red-500`}>
-          Unable to Fetch Posts
+          Unable to Fetch Posts Become a creator
         </TextWrapper>
         <TouchableOpacity
           onPress={() => router.push("/creators/")}
-          style={tw`mt-4 bg-yellow-500 p-2 rounded`}
+          style={tw`mt-4 bg-black p-2 rounded`}
         >
           <TextWrapperWhite>Become a Creator to see posts</TextWrapperWhite>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push("/creators/explore")}
+          style={tw`mt-4 bg-black p-2 rounded`}
+        >
+          <TextWrapperWhite>Visit Our Explore page</TextWrapperWhite>
         </TouchableOpacity>
       </View>
     );

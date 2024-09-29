@@ -1,27 +1,103 @@
-import { Link, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Pressable,
   Image,
-  FlatList,
+  Pressable,
   ActivityIndicator,
+  FlatList,
+  Alert,
 } from "react-native";
-import { TextWrapper, TextWrapperWhite } from "../../components/textwrapper";
-import { SafeViewComponent } from "../../components/safeview";
-import { useGetUserByUsername } from "../../services/user/queries";
-import { MaterialIcons } from "@expo/vector-icons";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import tw from "twrnc";
+import { useLocalSearchParams } from "expo-router";
+import { useGetUserByUsername } from "../../services/user/queries";
+import { TextWrapper, TextWrapperWhite } from "../../components/textwrapper";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { useIsFocused } from "@react-navigation/native";
 import { ProfilePosts } from "../../components/profile/ProfilePost";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SubscriptionModal } from "../../components/subscribeModal";
 
 export default function Creator() {
   const params = useLocalSearchParams();
   const username = params.username ? String(params.username) : "";
   const { data: profile, isLoading, error } = useGetUserByUsername(username);
+  const focused = useIsFocused();
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Check for loading state
+  useEffect(() => {
+    // Check if user is subscribed based on the profile data
+    if (profile?.subscribed_to_user) {
+      setIsSubscribed(true);
+    } else {
+      setIsSubscribed(false);
+    }
+  }, [profile]);
+
+  const subscribe = async () => {
+    if (profile?.free_subscription === "no") {
+      setIsModalVisible(true);
+    } else {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) {
+          throw new Error("No token found");
+        }
+
+        const response = await axios.post(
+          `https://api.myklan.africa/public/api/subscription/free/${profile?.user.id}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          Alert.alert("Success", "Subscription successful!");
+          setIsSubscribed(true);
+        } else {
+          Alert.alert("Error", "Subscription failed. Please try again.");
+        }
+      } catch (err) {
+        console.error("Subscription error:", err);
+        Alert.alert("Error", "An error occurred. Please try again.");
+      }
+    }
+  };
+
+  const unsubscribe = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const response = await axios.post(
+        `https://api.myklan.africa/public/api/subscription/wallet/cancel/${profile?.user.id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        Alert.alert("Success", "Unsubscription successful!");
+        setIsSubscribed(false);
+      } else {
+        Alert.alert("Error", "Unsubscription failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("Unsubscription error:", err);
+      Alert.alert("Error", "An error occurred. Please try again.");
+    }
+  };
+
   if (isLoading) {
     return (
       <ActivityIndicator
@@ -32,14 +108,9 @@ export default function Creator() {
     );
   }
 
-  // Check for errors
   if (error) {
-    console.error("Error fetching profile:", error);
     return <Text>Error loading profile</Text>;
   }
-
-  // Log profile updates data
-  console.log("Profile Updates Data:", profile?.updates.data);
 
   return (
     <View style={tw`bg-white flex-1`}>
@@ -50,53 +121,41 @@ export default function Creator() {
             source={{
               uri: `https://myklan.africa/public/uploads/cover/${profile?.user.cover}`,
             }}
-            style={tw`w-full h-20`}
+            style={tw`w-full h-30`}
           />
-          {/* Change Cover Image Button */}
-          <Pressable
-            style={tw`absolute bottom-0 left-0 flex-row gap-x-2 items-center bg-black py-2 px-3 rounded-full`}
-          >
-            <MaterialIcons name="camera-alt" size={20} color="white" />
-          </Pressable>
         </View>
 
         {/* Profile Image and Details */}
         <View style={tw`px-4 -mt-12`}>
           <View style={tw`flex-col items-center relative`}>
-            {/* Profile Image */}
-            <View style={tw`relative`}>
-              <Image
-                source={{
-                  uri: `https://myklan.africa/public/uploads/avatar/${profile?.user.avatar}`,
-                }}
-                style={tw`w-24 h-24 rounded-full border-4 border-black`}
-              />
-              {/* Edit Profile Image Button */}
-              <Pressable
-                style={tw`absolute bottom-0 right-8 bg-gray-800 p-1 rounded-full opacity-90`}
-              >
-                <MaterialIcons name="camera-alt" size={20} color="white" />
-              </Pressable>
-            </View>
-
-            {/* Username and Verified Badge */}
+            <Image
+              source={{
+                uri: `https://myklan.africa/public/uploads/avatar/${profile?.user.avatar}`,
+              }}
+              style={tw`w-24 h-24 rounded-full border-4 border-black`}
+            />
             <View style={tw`flex-row items-center mt-2 gap-x-2`}>
               <TextWrapper style={tw`text-lg font-semibold`}>
                 {profile?.user.username}
               </TextWrapper>
-              <MaterialIcons name="verified" size={20} color="black" />
             </View>
 
-            {/* Action Buttons: Edit Profile & Share */}
-            <View style={tw`flex-row gap-x-4 mt-3`}>
-              <Pressable style={tw`bg-black py-2 px-4 rounded-md`}>
-                <Link href={"/editprofile"} asChild>
-                  <TextWrapperWhite style={tw`text-sm font-medium`}>
-                    Subscribe
-                  </TextWrapperWhite>
-                </Link>
+            {/* Subscribe/Unsubscribe Button */}
+            {isSubscribed ? (
+              <Pressable
+                style={tw`mt-4 bg-gray-700 py-2 px-4 rounded-md`}
+                onPress={unsubscribe}
+              >
+                <TextWrapperWhite>Unsubscribe</TextWrapperWhite>
               </Pressable>
-            </View>
+            ) : (
+              <Pressable
+                style={tw`mt-4 bg-black py-2 px-4 rounded-md`}
+                onPress={subscribe}
+              >
+                <TextWrapperWhite>Subscribe</TextWrapperWhite>
+              </Pressable>
+            )}
           </View>
 
           {/* User Details Section */}
@@ -104,25 +163,10 @@ export default function Creator() {
             <TextWrapper style={tw`text-lg font-semibold`}>
               About Me
             </TextWrapper>
-
-            {/* Location */}
             <View style={tw`flex-row items-center gap-x-2 mt-2`}>
               <FontAwesome5 name="map-marker-alt" size={20} color="black" />
-              <TextWrapper style={tw`text-base`}>Nigeria</TextWrapper>
+              <TextWrapper>Nigeria</TextWrapper>
             </View>
-
-            {/* Member Since */}
-            <View style={tw`flex-row items-center gap-x-2 mt-2`}>
-              <FontAwesome5 name="calendar-alt" size={20} color="black" />
-              {profile?.user.date && (
-                <TextWrapper style={tw`text-base`}>
-                  Member since{" "}
-                  {new Date(profile.user.date).toLocaleDateString()}
-                </TextWrapper>
-              )}
-            </View>
-
-            {/* User Story */}
             <TextWrapper style={tw`text-base text-gray-700 mt-3`}>
               {profile?.user.story}
             </TextWrapper>
@@ -130,9 +174,9 @@ export default function Creator() {
         </View>
       </View>
 
+      {/* Posts */}
       <View style={tw`flex-1`}>
-        {/* Check if updates.data is present and has items */}
-        {profile?.updates.data && profile.updates.data.length > 0 ? (
+        {profile?.updates.data.length > 0 ? (
           <FlatList
             data={profile.updates.data}
             renderItem={({ item }) => (
@@ -149,6 +193,16 @@ export default function Creator() {
           <Text>No posts available</Text>
         )}
       </View>
+
+      {/* Subscription Modal */}
+      <SubscriptionModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onSubmit={() => {
+          setIsModalVisible(false);
+          subscribe();
+        }}
+      />
     </View>
   );
 }

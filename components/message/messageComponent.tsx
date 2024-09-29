@@ -3,11 +3,13 @@ import tw from "twrnc";
 import { TextWrapper, TextWrapperWhite } from "../textwrapper";
 import { Image, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 type MessageItemProps = {
   senderName: string;
   message: string;
   avatar: string;
   id: number;
+  userId: number;
 };
 
 export const MessageComponent = ({
@@ -15,9 +17,11 @@ export const MessageComponent = ({
   message,
   avatar,
   id,
+  userId,
 }: MessageItemProps) => {
   return (
     <TouchableOpacity
+      onPress={() => router.push(`/messages/${userId}`)}
       style={tw`bg-white p-4 rounded-lg mb-4 flex-row items-start shadow-md`}
     >
       <Image

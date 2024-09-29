@@ -49,6 +49,7 @@ export default function Messages() {
             message={item.message || ""}
             avatar={item.sender.avatar}
             id={item.id}
+            userId={item.sender.id}
           />
         )}
         keyExtractor={(item) => item.id.toString()}
