@@ -32,7 +32,7 @@ axiosInstance.interceptors.request.use(
 // Example function to get user
 export const getMySubscription = async () => {
   try {
-    const response = await axiosInstance.get<PaginatedResponse>('mysubscriptions');
+    const response = await axiosInstance.get('mysubscriptions');
     return response.data
   } catch (error) {
     console.error("Error fetching my subscription:", error);

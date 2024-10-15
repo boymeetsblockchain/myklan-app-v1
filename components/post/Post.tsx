@@ -8,11 +8,12 @@ import { TextWrapper } from "../textwrapper";
 import IconButton from "./IconButton";
 import { TimeAgo } from "../timeago";
 import ImageViewer from "react-native-image-zoom-viewer"; // Assuming you have this package
-import { router } from "expo-router";
+import { useRouter } from "expo-router"; // Use this hook for router navigation
 
 export const Post = ({ post }: { post: PostProp }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const router = useRouter(); // Initialize the router
 
   const openImageModal = (index: number) => {
     setSelectedImageIndex(index);
@@ -61,6 +62,15 @@ export const Post = ({ post }: { post: PostProp }) => {
 
       <Pressable
         style={tw`flex-col p-4 border-b mb-4 gap-y-4 border-gray-300 bg-white shadow-md rounded-lg`}
+        onPress={() =>
+          router.push({
+            pathname: `/post/[id]`,
+            params: {
+              username: post.creator.username,
+              id: post.id,
+            },
+          })
+        }
       >
         {/* User Info Section */}
         <View style={tw`flex flex-row gap-x-3 items-center`}>
@@ -74,7 +84,7 @@ export const Post = ({ post }: { post: PostProp }) => {
             <View style={tw`flex flex-row items-center gap-x-3`}>
               <TextWrapper
                 style={tw`text-base font-semibold`}
-                onPress={() => router.push(`profile/${post.creator.username}`)}
+                onPress={() => router.push(`/profile/${post.creator.username}`)} // Profile navigation
               >
                 @{post.creator.username}
               </TextWrapper>

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, ActivityIndicator, Image } from "react-native";
 import tw from "twrnc";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
 import { Notification } from "../../../../types/notifications";
-import { Image } from "react-native";
 import { TimeAgo } from "../../../../components/timeago";
 import { TextWrapper } from "../../../../components/textwrapper";
 
@@ -23,21 +22,29 @@ const NotificationItem = ({
   date,
 }: NotificationProps) => (
   <View
-    style={tw`bg-white p-4 rounded-lg mb-4 shadow-md border border-gray-300`}
+    style={tw`bg-white p-2 rounded-lg mb-2 shadow-md border border-gray-300`} // Reduced padding and margin
   >
-    <View style={tw`flex-row items-center mb-2`}>
+    <View style={tw`flex-row items-center mb-1`}>
       <Image
         source={{
           uri: `https://myklan.africa/public/uploads/avatar/${avatar}`,
         }}
-        style={tw`w-12 h-12 rounded-full border border-gray-300`}
+        style={tw`w-8 h-8 rounded-full border border-gray-300`} // Smaller avatar (reduced to 32x32 pixels)
       />
-      <View style={tw`ml-3 flex-1`}>
-        <TextWrapper fontWeight="bold" textSize="base">
+      <View style={tw`ml-2 flex-1`}>
+        <TextWrapper fontWeight="bold" textSize="sm">
+          {" "}
+          {/* Reduced text size */}
           {username}
         </TextWrapper>
-        <TextWrapper style={tw`text-gray-600 `}>{description}</TextWrapper>
-        <TextWrapper style={tw`text-gray-400 text-xs mt-1`}>
+        <TextWrapper style={tw`text-gray-600 text-xs`}>
+          {" "}
+          {/* Smaller description text */}
+          {description}
+        </TextWrapper>
+        <TextWrapper style={tw`text-gray-400 text-[10px] mt-0.5`}>
+          {" "}
+          {/* Smallest size for date */}
           {TimeAgo(date)}
         </TextWrapper>
       </View>
@@ -111,7 +118,7 @@ export default function NotificationsScreen() {
           />
         )}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={tw`px-4 pb-6`}
+        contentContainerStyle={tw`px-3 pb-4`} // Adjusted padding for thinner view
       />
     </View>
   );

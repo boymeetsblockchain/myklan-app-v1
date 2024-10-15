@@ -19,6 +19,7 @@ export const MessageComponent = ({
   id,
   userId,
 }: MessageItemProps) => {
+  console.log(userId, id, senderName);
   return (
     <TouchableOpacity
       onPress={() => router.push(`/messages/${userId}`)}

@@ -79,7 +79,7 @@ export default function Dashboard() {
             {/* Action Buttons: Edit Profile & Share */}
             <View style={tw`flex-row gap-x-4 mt-3`}>
               <Pressable style={tw`bg-black py-2 px-4 rounded-md`}>
-                <Link href={"/editprofile"} asChild>
+                <Link href={"/profile/editprofile"} asChild>
                   <TextWrapperWhite style={tw`text-sm font-medium`}>
                     Edit Profile
                   </TextWrapperWhite>

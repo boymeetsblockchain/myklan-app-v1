@@ -29,7 +29,7 @@ axiosInstance.interceptors.request.use(
 
 export const getExplorePost = async () => {
   try {
-    const response = await axiosInstance.get<PostResponse>('explore?sort=free');
+    const response = await axiosInstance.get('explore?sort=free');
     return response.data;
   } catch (error) {
     console.error("Error fetching posts:", error);

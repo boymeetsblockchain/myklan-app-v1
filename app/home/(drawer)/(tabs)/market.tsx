@@ -2,15 +2,16 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   FlatList,
-  StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import axios from "axios";
 import { SafeViewComponent } from "../../../../components/safeview";
-import tw from "twrnc"; // Tailwind CSS
+import tw from "twrnc";
 import { TextWrapper } from "../../../../components/textwrapper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 
 interface Product {
   id: number;
@@ -18,6 +19,7 @@ interface Product {
   price: string;
   description: string;
   file: string;
+  type: string;
   seller: {
     username: string;
     avatar: string;
@@ -25,13 +27,6 @@ interface Product {
   previews: {
     name: string;
   }[];
-}
-
-interface ProductsResponse {
-  current_page: number;
-  data: Product[];
-  last_page: number;
-  next_page_url: string | null;
 }
 
 export default function ProductListing() {
@@ -44,7 +39,7 @@ export default function ProductListing() {
   useEffect(() => {
     const fetchProducts = async (page: number) => {
       try {
-        const token = await AsyncStorage.getItem("authToken"); // Fetch Bearer token from AsyncStorage
+        const token = await AsyncStorage.getItem("authToken");
         if (!token) {
           throw new Error("No authentication token found");
         }
@@ -52,7 +47,7 @@ export default function ProductListing() {
           `https://api.myklan.africa/public/api/shop?page=${page}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Use Bearer token for authorization
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -91,26 +86,61 @@ export default function ProductListing() {
   }
 
   const renderItem = ({ item }: { item: Product }) => (
-    <View style={tw`p-4 bg-white rounded-lg shadow mb-4`}>
-      <TextWrapper style={tw`text-lg font-bold`}>{item.name}</TextWrapper>
-      <TextWrapper style={tw`text-gray-600`}>{item.description}</TextWrapper>
-      <TextWrapper style={tw`text-lg font-semibold mt-2`}>
-        Price: ${item.price}
+    <TouchableOpacity
+      onPress={() => router.push(`/shop/${item.id}`)}
+      style={tw`p-4 bg-white rounded-lg shadow-md mb-4`}
+    >
+      {/* Product Image */}
+      {item.previews[0]?.name && (
+        <View style={tw`relative mb-4`}>
+          <Image
+            source={{
+              uri: `https://myklan.africa/public/api/shop/${item.previews[0].name}`,
+            }}
+            style={tw`w-full h-48 rounded-lg`}
+            resizeMode="cover"
+          />
+          <TextWrapper
+            style={tw`absolute top-2 left-2 bg-gray-900 text-white px-2 py-1 rounded-full text-xs uppercase`}
+          >
+            {item.type}
+          </TextWrapper>
+          <TextWrapper
+            style={tw`absolute bottom-2 right-2 bg-black text-white px-3 py-1 rounded-full font-semibold text-base`}
+          >
+            ₦{item.price}
+          </TextWrapper>
+        </View>
+      )}
+
+      {/* Product Title */}
+      <TextWrapper style={tw`text-xl font-bold mb-1 text-gray-900`}>
+        {item.name}
       </TextWrapper>
-      <View style={tw`flex-row items-center justify-between mt-2`}>
-        <TextWrapper style={tw`text-gray-500`}>
-          Seller: {item.seller.username}
+
+      {/* Product Description */}
+      <TextWrapper style={tw`text-sm text-gray-600 mb-2`}>
+        {item.description}
+      </TextWrapper>
+
+      {/* Seller Info */}
+      <View style={tw`flex-row items-center mt-3`}>
+        <Image
+          source={{
+            uri: `https://myklan.africa/public/uploads/avatar/${item.seller.avatar}`,
+          }}
+          style={tw`w-10 h-10 rounded-full mr-3`}
+        />
+        <TextWrapper style={tw`text-sm text-gray-500`}>
+          {item.seller.username}
         </TextWrapper>
-        <TouchableOpacity style={tw`bg-black py-1 px-2 rounded`}>
-          <TextWrapper style={tw`text-white`}>View</TextWrapper>
-        </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
     <SafeViewComponent>
-      <View style={tw` flex-1`}>
+      <View style={tw`flex-1 p-4 bg-gray-50`}>
         <FlatList
           data={products}
           keyExtractor={(item) => item.id.toString()}
@@ -124,11 +154,11 @@ export default function ProductListing() {
           <TouchableOpacity
             onPress={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            style={tw`bg-gray-300 py-1 px-3 rounded ${
+            style={tw`px-4 py-2 bg-gray-300 rounded-md ${
               currentPage === 1 ? "opacity-50" : ""
             }`}
           >
-            <TextWrapper style={tw`text-gray-800`}>Previous</TextWrapper>
+            <TextWrapper style={tw`text-gray-700`}>Previous</TextWrapper>
           </TouchableOpacity>
 
           <TextWrapper>{`Page ${currentPage} of ${lastPage}`}</TextWrapper>
@@ -138,11 +168,11 @@ export default function ProductListing() {
               setCurrentPage((prev) => Math.min(prev + 1, lastPage))
             }
             disabled={currentPage === lastPage}
-            style={tw`bg-gray-300 py-1 px-3 rounded ${
+            style={tw`px-4 py-2 bg-gray-300 rounded-md ${
               currentPage === lastPage ? "opacity-50" : ""
             }`}
           >
-            <TextWrapper style={tw`text-gray-800`}>Next</TextWrapper>
+            <TextWrapper style={tw`text-gray-700`}>Next</TextWrapper>
           </TouchableOpacity>
         </View>
       </View>

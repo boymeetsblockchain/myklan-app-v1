@@ -12,6 +12,7 @@ import tw from "twrnc";
 import { Entypo } from "@expo/vector-icons";
 import { Media } from "../../types/post";
 import ImageViewer from "react-native-image-zoom-viewer"; // Assuming you have this package
+import { router } from "expo-router";
 
 export type Post = {
   id: number;
@@ -63,7 +64,18 @@ export const ProfilePosts = ({ post, avatar, username }: ProfilePostProps) => {
     <View
       style={tw`flex-col p-4 bg-gray-100 border border-gray-300 rounded-lg mb-4`}
     >
-      <Pressable style={tw`flex-row items-center justify-between mb-3`}>
+      <Pressable
+        style={tw`flex-row items-center justify-between mb-3`}
+        onPress={() =>
+          router.push({
+            pathname: `/post/[id]`,
+            params: {
+              username,
+              id: post.id,
+            },
+          })
+        }
+      >
         <View style={tw`flex-row items-center gap-x-3`}>
           {avatar && (
             <Image

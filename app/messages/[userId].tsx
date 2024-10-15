@@ -26,7 +26,7 @@ interface Message {
 }
 
 export default function MessagePage() {
-  const { userId } = useLocalSearchParams() as { userId: string }; // Type the params
+  const { userId } = useLocalSearchParams() as { userId: string };
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,11 +35,14 @@ export default function MessagePage() {
   // Function to fetch messages
   const fetchMessages = async () => {
     setLoading(true);
+    setError(""); // Reset error state
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
         throw new Error("No token found");
       }
+
+      console.log(userId);
 
       const response = await axios.get(
         `https://api.myklan.africa/public/api/messages/${userId}`,
@@ -72,9 +75,11 @@ export default function MessagePage() {
   // Function to send a message
   const sendMessage = async () => {
     if (!newMessage.trim()) {
+      setError("Message cannot be empty");
       return;
     }
 
+    setError(""); // Reset error state
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
@@ -96,8 +101,8 @@ export default function MessagePage() {
 
       if (response.data.success) {
         setMessages((prevMessages) => [
+          response.data.new_message, // Add new message to the top
           ...prevMessages,
-          response.data.new_message,
         ]);
         setNewMessage(""); // Clear input field
       } else {
