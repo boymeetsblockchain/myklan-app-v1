@@ -67,6 +67,7 @@ export default function Dashboard() {
         renderItem={({ item }) => <Post post={item} />}
         keyExtractor={(item) => item.id.toString()}
         style={tw`z-0`}
+        showsVerticalScrollIndicator={false}
       />
 
       {/* Plus button with the IconMenu */}

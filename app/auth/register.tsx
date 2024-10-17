@@ -1,7 +1,7 @@
 import { TextWrapper } from "../../components/textwrapper";
 import { SafeViewComponent } from "../../components/safeview";
 import tw from "twrnc";
-import { View, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { Colors } from "../../utils/colors";
 import { InputComp, PasswordInputComp } from "../../components/input";
 import { Button } from "../../components/button";
@@ -23,6 +23,7 @@ export default function Register() {
   const onSubmit = () => {
     if (!email || !name || !password) {
       alert("Please fill in all Fields");
+      return;
     }
 
     if (checked) {
@@ -55,18 +56,22 @@ export default function Register() {
 
   return (
     <SafeViewComponent>
-      <View style={tw`items-center justify-center flex-1`}>
+      <View style={tw`items-center justify-center flex-1 bg-white`}>
         <View
           style={[
-            tw`p-6 w-full rounded-lg shadow-lg gap-y-5`,
-            { backgroundColor: Colors.white },
+            tw`p-8 w-full rounded-lg shadow-lg gap-y-6`,
+            {
+              backgroundColor: Colors.white,
+              borderColor: Colors.grey,
+              borderWidth: 1,
+            },
           ]}
         >
           <TextWrapper
             fontWeight="bold"
-            textSize="lg"
+            textSize="2xl"
             style={{
-              color: Colors.grey,
+              color: Colors.black,
               textAlign: "center",
               marginBottom: 10,
             }}
@@ -74,6 +79,7 @@ export default function Register() {
             Sign Up
           </TextWrapper>
           <TextWrapper
+            textSize="md"
             style={{
               color: Colors.grey,
               textAlign: "center",
@@ -82,13 +88,13 @@ export default function Register() {
           >
             Join now! It takes only a few steps.
           </TextWrapper>
-          <View style={tw`gap-y-5`}>
+          <View style={tw`gap-y-6`}>
             {/* Full Name Input */}
             <InputComp
               placeholder="Full Name"
               value={name}
               onChange={setName}
-              inputClass="shadow-md w-full"
+              inputClass="shadow-lg w-full border-gray-300 rounded-lg"
             />
 
             {/* Email Input */}
@@ -96,7 +102,7 @@ export default function Register() {
               placeholder="Email"
               value={email}
               onChange={setEmail}
-              inputClass="shadow-md w-full"
+              inputClass="shadow-lg w-full border-gray-300 rounded-lg"
             />
 
             {/* Password Input */}
@@ -104,26 +110,28 @@ export default function Register() {
               placeholder="Password"
               value={password}
               onChange={setPassword}
-              inputClass="shadow-md w-full"
+              inputClass="shadow-lg w-full border-gray-300 rounded-lg"
             />
 
             {/* Checkbox for agreement */}
-            <View style={tw`flex-row gap-x-2 items-center`}>
+            <View style={tw`flex-row gap-x-3 items-center`}>
               {checked ? (
                 <AntDesign
                   name="checksquare"
                   size={24}
-                  color="black"
+                  color={Colors.black}
                   onPress={() => setIsChecked(false)} // Uncheck on click
                 />
               ) : (
                 <TouchableOpacity
                   onPress={() => setIsChecked(true)} // Check on click
-                  style={tw`h-4 w-4 border border-gray-300`}
-                ></TouchableOpacity>
+                  style={tw`h-6 w-6 border border-gray-400 rounded-lg flex items-center justify-center`}
+                >
+                  <AntDesign name="plus" size={12} color={Colors.grey} />
+                </TouchableOpacity>
               )}
 
-              <TextWrapper textSize="sm">
+              <TextWrapper textSize="sm" style={{ color: Colors.black }}>
                 I agree with the processing of personal data, Terms and
                 Conditions, and Privacy Policy.
               </TextWrapper>
@@ -131,14 +139,17 @@ export default function Register() {
 
             {/* Sign Up Button */}
             <Button
-              text={registerNewUser.isPending ? "Registering ....." : "Sign Up"}
+              text={registerNewUser.isPending ? "Registering..." : "Sign Up"}
               onPress={onSubmit}
             />
 
             {/* Already have an account */}
-            <View style={tw`items-center justify-center`}>
+            <View style={tw`items-center justify-center mt-4`}>
               <Link href={"/"}>
-                <TextWrapper style={tw`text-center`} textSize="sm">
+                <TextWrapper
+                  textSize="sm"
+                  style={{ color: Colors.black, textAlign: "center" }}
+                >
                   Already have an account?
                 </TextWrapper>
               </Link>

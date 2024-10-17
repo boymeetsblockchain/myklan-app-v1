@@ -6,7 +6,6 @@ import { UpdateData } from "../../../types/bookmark";
 import { Post } from "../../../components/post/Post";
 
 export default function Bookmarks() {
-  // Fetch bookmarks using the custom hook
   const { data: bookmarks, isLoading, isError, error } = useGetBookmarks();
 
   // Display loading state

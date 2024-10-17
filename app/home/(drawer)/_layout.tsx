@@ -4,6 +4,7 @@ import { CustomHeader } from "../../../components/customHeader";
 import Icon from "react-native-vector-icons/Ionicons";
 import { FontAwesome } from "@expo/vector-icons";
 import { CustomDrawerContent } from "../../../components/customHeaderDrawer";
+import { style } from "twrnc";
 
 const DrawerNavigator = createDrawerNavigator().Navigator;
 const Drawer = withLayoutContext(DrawerNavigator);
@@ -21,6 +22,7 @@ export default function DrawerLayout() {
         drawerInactiveTintColor: "#000", // Black for inactive items
         drawerStyle: { backgroundColor: "#fff" }, // White background
         headerShown: true,
+        drawerLabelStyle: { fontFamily: "Poppins-Regular" },
         header: () => <CustomHeader />, // Custom header component
       }}
     >
@@ -74,8 +76,18 @@ export default function DrawerLayout() {
         name="subscribers"
         options={{
           title: "My Subscribers",
+
           drawerIcon: ({ color, size }: { color: string; size: number }) => (
             <Icon name="people-outline" color={color} size={24} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="product"
+        options={{
+          title: "My Products",
+          drawerIcon: ({ color, size }: { color: string; size: number }) => (
+            <Icon name="cart-outline" color={color} size={24} />
           ),
         }}
       />

@@ -23,24 +23,24 @@ export default function RootLayout() {
   useEffect(() => {
     const prepareData = async () => {
       try {
+        // Prevent the splash screen from hiding automatically
         await SplashScreen.preventAutoHideAsync();
 
         // Load fonts
         await fetchFonts();
 
-        setDataLoaded(true);
-        await SplashScreen.hideAsync();
+        setDataLoaded(true); // Fonts loaded successfully
+        await SplashScreen.hideAsync(); // Hide splash screen once fonts are loaded
       } catch (error) {
-        console.error(error);
+        console.error("Error loading resources: ", error);
       }
     };
 
     prepareData();
   }, []);
 
-  // Return AppLoading if data is not loaded yet
   if (!dataLoaded) {
-    return <AppLoading />;
+    return null;
   }
 
   return (

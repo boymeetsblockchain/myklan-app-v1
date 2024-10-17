@@ -95,7 +95,7 @@ export default function ProductListing() {
         <View style={tw`relative mb-4`}>
           <Image
             source={{
-              uri: `https://myklan.africa/public/api/shop/${item.previews[0].name}`,
+              uri: `https://myklan.africa/public/uploads/shop/${item.previews[0].name}`,
             }}
             style={tw`w-full h-48 rounded-lg`}
             resizeMode="cover"
@@ -147,6 +147,7 @@ export default function ProductListing() {
           renderItem={renderItem}
           contentContainerStyle={tw`pb-4`}
           ListEmptyComponent={<TextWrapper>No products found.</TextWrapper>}
+          showsVerticalScrollIndicator={false}
         />
 
         {/* Pagination Controls */}

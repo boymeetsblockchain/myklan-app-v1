@@ -135,8 +135,27 @@ export default function SinglePostPage() {
         }
       );
       console.log("Post liked successfully", response.data);
+      alert("Post Liked");
     } catch (error) {
       console.error("Error liking post:", error);
+    }
+  };
+  const bookMarkPost = async () => {
+    try {
+      const token = await getToken();
+      const response = await axios.post(
+        `https://api.myklan.africa/public/api/add/bookmark/${id}:`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Post liked successfully", response.data);
+      alert("Post bookmarked");
+    } catch (error) {
+      console.error("Error boomakrking post:", error);
     }
   };
 
@@ -299,9 +318,12 @@ export default function SinglePostPage() {
                 text={post?.updates.likes.length || 0}
                 onPress={likePost}
               />
-              <IconButton icon="share-apple" />
+              <IconButton
+                icon="share-apple"
+                onPress={() => setTipModalVisible(true)}
+              />
             </View>
-            <IconButton icon="tag" onPress={() => setTipModalVisible(true)} />
+            <IconButton icon="tag" onPress={bookMarkPost} />
           </View>
         </View>
 

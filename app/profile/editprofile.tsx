@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { View, TextInput, Pressable, ScrollView, Alert } from "react-native";
 import tw from "twrnc";
-import { User } from "../../types/user";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useGetUserProfile } from "../../services/profile/queries";
 import { TextWrapper } from "../../components/textwrapper";
+import { SafeViewComponent } from "../../components/safeview";
 
 const EditProfile = () => {
   const { data: profile, isLoading } = useGetUserProfile();
@@ -55,72 +55,117 @@ const EditProfile = () => {
   };
 
   return (
-    <ScrollView style={tw`flex-1 bg-white p-4`}>
+    <SafeViewComponent>
       {/* Name Field */}
-      <View style={tw`mb-4`}>
-        <TextWrapper style={tw`mb-2`}>Name</TextWrapper>
+      <View style={tw`mb-6`}>
+        <TextWrapper style={tw`mb-2 text-lg font-semibold text-gray-700`}>
+          Name
+        </TextWrapper>
         <TextInput
-          style={tw`bg-gray-200 text-black p-2 rounded-md`}
+          style={[
+            {},
+            tw`border border-gray-300 text-black p-3 rounded-lg focus:border-blue-500`,
+          ]}
           value={name}
           onChangeText={setName}
+          placeholder="Enter your name"
         />
       </View>
 
       {/* Username Field */}
-      <View style={tw`mb-4`}>
-        <TextWrapper style={tw`mb-2`}>Username</TextWrapper>
+      <View style={tw`mb-6`}>
+        <TextWrapper style={tw`mb-2 text-lg font-semibold text-gray-700`}>
+          Username
+        </TextWrapper>
         <TextInput
-          style={tw`bg-gray-200 text-black p-2 rounded-md`}
+          style={[
+            {
+              fontFamily: "Poppins-Regular",
+              fontSize: 16,
+            },
+            tw`border border-gray-300 text-black p-3 rounded-lg focus:border-blue-500`,
+          ]}
           value={username}
           onChangeText={setUsername}
+          placeholder="Enter your username"
         />
       </View>
 
       {/* About/Story Field */}
-      <View style={tw`mb-4`}>
-        <TextWrapper style={tw`mb-2`}>About</TextWrapper>
+      <View style={tw`mb-6`}>
+        <TextWrapper style={tw`mb-2 text-lg font-semibold text-gray-700`}>
+          About
+        </TextWrapper>
         <TextInput
-          style={tw`bg-gray-200 text-black p-2 rounded-md`}
+          style={[
+            {
+              fontFamily: "Poppins-Regular",
+              fontSize: 16,
+            },
+            tw`border border-gray-300 text-black p-3 rounded-lg focus:border-blue-500`,
+          ]}
           value={story}
           onChangeText={setStory}
+          placeholder="Tell us something about you"
+          multiline
         />
       </View>
 
       {/* Address Field */}
-      <View style={tw`mb-4`}>
-        <TextWrapper style={tw`mb-2`}>Address</TextWrapper>
+      <View style={tw`mb-6`}>
+        <TextWrapper style={tw`mb-2 text-lg font-semibold text-gray-700`}>
+          Address
+        </TextWrapper>
         <TextInput
-          style={tw`bg-gray-200 text-black p-2 rounded-md`}
+          style={[
+            {
+              fontFamily: "Poppins-Regular",
+              fontSize: 16,
+            },
+            tw`border border-gray-300 text-black p-3 rounded-lg focus:border-blue-500`,
+          ]}
           value={address}
           onChangeText={setAddress}
+          placeholder="Enter your address"
         />
       </View>
 
       {/* City Field */}
-      <View style={tw`mb-4`}>
-        <TextWrapper style={tw`mb-2`}>Location</TextWrapper>
+      <View style={tw`mb-6`}>
+        <TextWrapper style={tw`mb-2 text-lg font-semibold text-gray-700`}>
+          Location
+        </TextWrapper>
         <TextInput
-          style={tw`bg-gray-200 text-black p-2 rounded-md`}
+          style={[
+            {
+              fontFamily: "Poppins-Regular",
+              fontSize: 16,
+            },
+            tw`border border-gray-300 text-black p-3 rounded-lg focus:border-blue-500`,
+          ]}
           value={city}
           onChangeText={setCity}
+          placeholder="Enter your city"
         />
       </View>
 
       {/* Error Message */}
       {error ? (
-        <TextWrapper style={tw`text-red-500 mb-4`}>{error}</TextWrapper>
+        <TextWrapper style={tw`text-red-500 text-center mb-6`}>
+          {error}
+        </TextWrapper>
       ) : null}
 
       {/* Save Changes Button */}
       <Pressable
-        style={tw`bg-black py-2 px-4 rounded-md mt-4`}
+        style={tw`bg-black py-3 rounded-lg shadow-lg mt-4`}
         onPress={updateUser}
       >
-        <TextWrapper style={tw`text-white text-center text-lg font-medium`}>
+        <TextWrapper style={tw`text-white text-center text-lg font-semibold`}>
           Save Changes
         </TextWrapper>
       </Pressable>
-    </ScrollView>
+    </SafeViewComponent>
   );
 };
 

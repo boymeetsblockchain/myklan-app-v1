@@ -18,10 +18,9 @@ interface InputCompProps {
   inputClass?: string;
   labelClass?: string;
   value: string;
-  onChange: (text: string) => void; // onChange function prop
+  onChange: (text: string) => void;
 }
 
-// InputComp functional component
 export const InputComp: React.FC<InputCompProps> = ({
   label,
   placeholder,
@@ -43,7 +42,11 @@ export const InputComp: React.FC<InputCompProps> = ({
       )}
       <TextInput
         style={[
-          tw`bg-white h-11.5 rounded-xl px-4`,
+          {
+            fontFamily: "Poppins-Regular",
+            fontSize: 16,
+          },
+          tw`bg-white h-12 rounded-xl px-4`, // Updated height
           inputClass ? tw`${inputClass}` : {},
         ]}
         placeholder={placeholder}
@@ -78,26 +81,28 @@ export const PasswordInputComp: React.FC<
       <View style={tw`relative`}>
         <TextInput
           style={[
-            tw`bg-white h-11.5 rounded-xl px-4`,
+            {
+              fontFamily: "Poppins-Regular",
+              fontSize: 16,
+            },
+            tw`bg-white h-12 rounded-xl px-4`, // Updated height
             inputClass ? tw`${inputClass}` : {},
           ]}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           secureTextEntry={!showPass}
           value={value}
-          onChangeText={onChange} // Handle the onChange prop
+          onChangeText={onChange}
         />
         <TouchableOpacity
           style={styles.eyeIcon}
           onPress={() => setShowPass(!showPass)}
         >
-          <TextWrapper style={tw`text-gray-500`}>
-            {showPass ? (
-              <Ionicons name="eye-off-outline" size={24} color="black" />
-            ) : (
-              <Ionicons name="eye-outline" size={24} color="black" />
-            )}
-          </TextWrapper>
+          {showPass ? (
+            <Ionicons name="eye-off-outline" size={24} color="black" />
+          ) : (
+            <Ionicons name="eye-outline" size={24} color="black" />
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -109,7 +114,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 10,
     top: "50%",
-    transform: [{ translateY: -10 }],
+    transform: [{ translateY: -12 }], // Adjust for better centering
     zIndex: 10,
   },
 });

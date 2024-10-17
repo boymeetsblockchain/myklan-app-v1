@@ -19,6 +19,7 @@ export default function Home() {
   const onSubmit = () => {
     if (!email || !password) {
       alert("Please fill in all Fields");
+      return;
     }
 
     console.log(email);
@@ -30,18 +31,22 @@ export default function Home() {
 
   return (
     <SafeViewComponent>
-      <View style={tw`items-center justify-center  flex-1 `}>
+      <View style={tw`items-center justify-center flex-1 bg-white`}>
         <View
           style={[
-            tw`p-6 w-full rounded-lg shadow-lg gap-y-3`,
-            { backgroundColor: Colors.white },
+            tw`p-8 w-full rounded-lg shadow-lg gap-y-6`,
+            {
+              backgroundColor: Colors.white,
+              borderColor: Colors.grey,
+              borderWidth: 1,
+            },
           ]}
         >
           <TextWrapper
             fontWeight="bold"
-            textSize="lg"
+            textSize="2xl"
             style={{
-              color: Colors.grey,
+              color: Colors.black,
               textAlign: "center",
               marginBottom: 10,
             }}
@@ -49,59 +54,67 @@ export default function Home() {
             Welcome Back
           </TextWrapper>
           <TextWrapper
+            textSize="md"
             style={{
               color: Colors.grey,
               textAlign: "center",
               marginBottom: 20,
             }}
           >
-            Happy to See you Again!
+            We're happy to see you again!
           </TextWrapper>
-          <View style={tw`gap-y-5`}>
+          <View style={tw`gap-y-6`}>
             <InputComp
               placeholder="Email"
               value={email}
               onChange={setEmail}
-              inputClass="shadow-md w-full"
+              inputClass="shadow-lg w-full border-gray-300 rounded-lg"
             />
 
             <PasswordInputComp
               placeholder="Password"
               value={password}
               onChange={setPassword}
-              inputClass="shadow-md w-full"
+              inputClass="shadow-lg w-full border-gray-300 rounded-lg"
             />
-            <View style={tw`flex-row gap-x-2 items-center`}>
+
+            <View style={tw`flex-row gap-x-3 items-center`}>
               {checked ? (
                 <AntDesign
                   name="checksquare"
                   size={24}
-                  color="black"
-                  onPress={() => {
-                    setIsChecked(true);
-                  }}
+                  color={Colors.black}
+                  onPress={() => setIsChecked(false)}
                 />
               ) : (
                 <TouchableOpacity
-                  onPress={() => {
-                    setIsChecked(true);
-                  }}
-                  style={tw`h-4 w-4 border border-gray-300 `}
-                ></TouchableOpacity>
+                  onPress={() => setIsChecked(true)}
+                  style={tw`h-6 w-6 border border-gray-400 rounded-lg flex items-center justify-center`}
+                >
+                  <AntDesign name="plus" size={12} color={Colors.grey} />
+                </TouchableOpacity>
               )}
 
-              <TextWrapper textSize="sm">Remember me</TextWrapper>
+              <TextWrapper textSize="sm" style={{ color: Colors.black }}>
+                Remember me
+              </TextWrapper>
             </View>
+
             <Button
-              text={loginNewUser.isPending ? "Logining..." : "Login"}
+              text={loginNewUser.isPending ? "Logging in..." : "Login"}
               onPress={onSubmit}
             />
-            <View style={tw`my-3 justify-between flex-row   items-center`}>
+
+            <View style={tw`my-4 justify-between flex-row items-center`}>
               <Link href={"/auth/password"}>
-                <TextWrapper textSize="sm">Forgot Password ?</TextWrapper>
+                <TextWrapper textSize="sm" style={{ color: Colors.black }}>
+                  Forgot Password?
+                </TextWrapper>
               </Link>
               <Link href={"/auth/register"}>
-                <TextWrapper textSize="sm">Dont have an Account?</TextWrapper>
+                <TextWrapper textSize="sm" style={{ color: Colors.black }}>
+                  Don't have an Account?
+                </TextWrapper>
               </Link>
             </View>
           </View>

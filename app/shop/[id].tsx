@@ -174,7 +174,7 @@ export default function ShopProduct() {
         <View style={tw`relative mb-4`}>
           <Image
             source={{
-              uri: `https://api.myklan.africa/public/api/shop/${previews[0].name}`,
+              uri: `https://myklan.africa/public/uploads/shop/${previews[0].name}`,
             }}
             style={tw`w-full h-48 rounded-lg`}
             resizeMode="cover"
@@ -203,15 +203,6 @@ export default function ShopProduct() {
               style={tw`bg-black text-white px-3 py-1 rounded-full text-center my-3`}
             >
               Buy Now
-            </TextWrapper>
-          </TouchableOpacity>
-        )}
-        {!productData.isUserProduct && (
-          <TouchableOpacity onPress={editProduct}>
-            <TextWrapper
-              style={tw`bg-black text-white px-3 py-1 rounded-full text-center my-3`}
-            >
-              Edit Product
             </TextWrapper>
           </TouchableOpacity>
         )}

@@ -135,7 +135,7 @@ export const Post = ({ post }: { post: PostProp }) => {
               <IconButton icon="heart" text={post.likes_count} />
               <IconButton icon="share-apple" />
             </View>
-            <IconButton icon="tag" />
+            <IconButton icon="tag" text={post.bookmarks_count} />
           </View>
         </View>
       </Pressable>
