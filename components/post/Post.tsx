@@ -103,6 +103,12 @@ export const Post = ({ post }: { post: PostProp }) => {
 
         {/* Post Content Section */}
         <View>
+          <TextWrapper
+            style={tw`text-base text-gray-700  text-lg  px-1`}
+            fontWeight="bold"
+          >
+            {post.title}
+          </TextWrapper>
           <TextWrapper style={tw`text-base text-gray-700 px-1`}>
             {post.description}
           </TextWrapper>

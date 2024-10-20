@@ -9,9 +9,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { TextWrapper } from "../../components/textwrapper";
 import { useLocalSearchParams } from "expo-router";
-import { SafeViewComponent } from "../../components/safeview";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import tw from "twrnc";
@@ -19,10 +17,8 @@ import tw from "twrnc";
 interface Message {
   id: number;
   message: string;
-  sender: {
-    username: string;
-  };
-  recipient_id: number;
+  to_user_id: number;
+  from_user_id: number;
 }
 
 export default function MessagePage() {
@@ -31,18 +27,40 @@ export default function MessagePage() {
   const [newMessage, setNewMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+  console.log(userId);
+
+  // Function to fetch current user's ID
+  const fetchCurrentUserId = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("No token found");
+    }
+    try {
+      const response = await axios.get(
+        "https://api.myklan.africa/public/api/user",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCurrentUserId(response.data.user_id);
+    } catch (err) {
+      console.error("Error fetching user:", err);
+    }
+  };
 
   // Function to fetch messages
   const fetchMessages = async () => {
     setLoading(true);
-    setError(""); // Reset error state
+    setError("");
     try {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) {
         throw new Error("No token found");
       }
-
-      console.log(userId);
 
       const response = await axios.get(
         `https://api.myklan.africa/public/api/messages/${userId}`,
@@ -53,7 +71,6 @@ export default function MessagePage() {
         }
       );
 
-      // Check if the response contains messages
       if (response.data && response.data.messages) {
         setMessages(response.data.messages);
       } else {
@@ -67,9 +84,10 @@ export default function MessagePage() {
     }
   };
 
-  // Fetch messages on component mount and when userId changes
+  // Fetch messages and current user ID on component mount
   useEffect(() => {
-    fetchMessages();
+    fetchCurrentUserId(); // Fetch the current user ID
+    fetchMessages(); // Fetch the messages
   }, [userId]);
 
   // Function to send a message
@@ -89,7 +107,7 @@ export default function MessagePage() {
       const response = await axios.post(
         `https://api.myklan.africa/public/api/message/send`,
         {
-          recipient_id: Number(userId),
+          id_user: Number(userId),
           message: newMessage,
         },
         {
@@ -100,32 +118,58 @@ export default function MessagePage() {
       );
 
       if (response.data.success) {
+        // Add new message to the state and reset input
         setMessages((prevMessages) => [
-          response.data.new_message, // Add new message to the top
+          response.data.new_message,
           ...prevMessages,
         ]);
-        setNewMessage(""); // Clear input field
+        setNewMessage(""); // Clear the input field
       } else {
-        setError("Failed to send message.");
+        // Display the error message returned from the API
+        setError(response.data.error || "Failed to send message.");
       }
-    } catch (err) {
-      console.error("Error sending message:", err);
-      setError("Error sending message.");
+    } catch (err: any) {
+      // Catch and display any network or unexpected errors
+      console.error("Error sending message:", err.message);
+      setError(err.response?.data?.error || "Error sending message.");
     }
   };
 
+  // Function to render each message
+  const renderItem = ({ item }: { item: Message }) => {
+    const isCurrentUser = currentUserId === item.from_user_id;
+
+    return (
+      <View
+        style={[
+          tw`flex-row mb-2`,
+          isCurrentUser ? tw`justify-end` : tw`justify-start`,
+        ]}
+      >
+        <View
+          style={[
+            tw`max-w-4/5 p-3 rounded-lg`,
+            isCurrentUser ? tw`bg-black` : tw`bg-gray-200`,
+          ]}
+        >
+          <Text
+            style={tw`text-sm ${isCurrentUser ? "text-white" : "text-black"}`}
+          >
+            {item.message}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <SafeViewComponent>
+    <View style={tw`flex-1 bg-white`}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={tw`flex-1`}
       >
+        {/* Message List */}
         <View style={tw`flex-1 p-4`}>
-          <TextWrapper style={tw`text-lg font-bold mb-2`}>
-            Chat with User {userId}
-          </TextWrapper>
-
-          {/* Message list */}
           {loading ? (
             <ActivityIndicator size="large" color="#ffde59" />
           ) : error ? (
@@ -134,34 +178,29 @@ export default function MessagePage() {
             <FlatList
               data={messages}
               keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <View style={tw`mb-4`}>
-                  <Text style={tw`text-sm text-gray-600`}>
-                    <Text style={tw`text-black`}>{item.message}</Text>
-                  </Text>
-                </View>
-              )}
+              renderItem={renderItem}
               inverted
+              contentContainerStyle={tw`flex-grow justify-end`}
             />
           )}
+        </View>
 
-          {/* Send message input */}
-          <View style={tw`mt-4 flex-row items-center`}>
-            <TextInput
-              style={tw`flex-1 border border-gray-300 rounded-md p-3`}
-              placeholder="Type a message..."
-              value={newMessage}
-              onChangeText={setNewMessage}
-            />
-            <Pressable
-              style={tw`ml-2 bg-black p-3 rounded-md`}
-              onPress={sendMessage}
-            >
-              <Text style={tw`text-white font-bold`}>Send</Text>
-            </Pressable>
-          </View>
+        {/* Message Input */}
+        <View style={tw`p-4 flex-row border-t border-gray-300`}>
+          <TextInput
+            style={tw`flex-1 border border-gray-300 rounded-full p-3`}
+            placeholder="Type a message..."
+            value={newMessage}
+            onChangeText={setNewMessage}
+          />
+          <Pressable
+            style={tw`ml-2 bg-black p-3 rounded-2xl`}
+            onPress={sendMessage}
+          >
+            <Text style={tw`text-white text-center font-bold`}>Send</Text>
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
-    </SafeViewComponent>
+    </View>
   );
 }

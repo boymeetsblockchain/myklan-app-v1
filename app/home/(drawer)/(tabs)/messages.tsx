@@ -45,11 +45,11 @@ export default function Messages() {
         data={messages}
         renderItem={({ item }) => (
           <MessageComponent
-            senderName={item.sender.username || "Unknown"}
+            senderName={item.receiver.username || "Unknown"}
             message={item.message || ""}
-            avatar={item.sender.avatar}
+            avatar={item.receiver.avatar}
             id={item.id}
-            userId={item.sender.id}
+            userId={item.receiver.id}
           />
         )}
         keyExtractor={(item) => item.id.toString()}

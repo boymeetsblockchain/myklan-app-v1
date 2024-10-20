@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { SafeViewComponent } from "../../components/safeview";
 import { useGetUser } from "../../services/user/queries";
 import { AntDesign } from "@expo/vector-icons";
@@ -15,11 +22,11 @@ interface User {
 }
 
 export default function PostPage() {
-  const { data: user } = useGetUser<User>();
+  const { data: user } = useGetUser();
   const [postContent, setPostContent] = useState<string>("");
   const [postTitle, setPostTitle] = useState<string>("");
   const [postPrice, setPostPrice] = useState<string>("");
-  const [selectedImage, setSelectedImage] = useState<string | null>(null); // State for selected image
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const handlePostSubmit = async () => {
     try {
@@ -31,16 +38,15 @@ export default function PostPage() {
       const formData = new FormData();
       formData.append("title", postTitle);
       formData.append("description", postContent);
-      formData.append("price", String(postPrice)); // Convert price to a string
+      formData.append("price", String(postPrice));
 
-      // Include the selected image if available
-      if (selectedImage) {
-        formData.append("image", {
-          uri: selectedImage,
-          type: "image/jpeg", // Adjust according to your needs
-          name: selectedImage.split("/").pop() || "image.jpg", // Default filename
-        } as any); // Type assertion since FormData expects 'any'
-      }
+      selectedImages.forEach((imageUri, index) => {
+        formData.append(`fileuploader-list-photo[]`, {
+          uri: imageUri,
+          type: "image/jpeg",
+          name: imageUri.split("/").pop() || `image_${index}.jpg`,
+        } as any);
+      });
 
       const response = await axios.post(
         "https://api.myklan.africa/public/api/post",
@@ -59,7 +65,7 @@ export default function PostPage() {
         alert("Failed to create post: " + response.data.message);
       }
     } catch (err: any) {
-      console.error(err);
+      console.error(err.response?.data?.message);
       alert(
         "An error occurred: " +
           (err.response?.data?.message ||
@@ -70,7 +76,6 @@ export default function PostPage() {
   };
 
   const handleImagePicker = async () => {
-    // Request permission to access the media library
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -79,16 +84,18 @@ export default function PostPage() {
       return;
     }
 
-    // Launch the image picker
+    // Launch the image picker (allow multiple selection)
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsMultipleSelection: true,
+
       aspect: [4, 3],
       quality: 1,
     });
 
-    if (!result.canceled && result.assets[0]?.uri) {
-      setSelectedImage(result.assets[0].uri);
+    if (!result.canceled && result.assets) {
+      const uris = result.assets.map((asset) => asset.uri);
+      setSelectedImages(uris);
     }
   };
 
@@ -135,17 +142,20 @@ export default function PostPage() {
           style={tw`bg-gray-200 p-3 rounded-lg mb-4`}
         >
           <Text style={tw`text-center text-gray-700`}>
-            {selectedImage ? "Change Image" : "Select Image"}
+            {selectedImages.length > 0 ? "Change Images" : "Select Images"}
           </Text>
         </TouchableOpacity>
 
-        {/* Display Selected Image */}
-        {selectedImage && (
-          <Image
-            source={{ uri: selectedImage }}
-            style={tw`h-40 w-full mb-4 rounded-lg`}
-          />
-        )}
+        {/* Display Selected Images */}
+        <ScrollView horizontal style={tw`mb-4`}>
+          {selectedImages.map((imageUri, index) => (
+            <Image
+              key={index}
+              source={{ uri: imageUri }}
+              style={tw`h-40 w-40 mr-2 rounded-lg`}
+            />
+          ))}
+        </ScrollView>
 
         {/* Post Price Input */}
         <TextInput

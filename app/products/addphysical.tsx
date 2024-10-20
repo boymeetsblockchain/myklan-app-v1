@@ -23,7 +23,7 @@ export default function AddDigitalProduct() {
   const [boxcontent, setBoxcontent] = useState("");
   const [quantity, setQuantity] = useState("");
   const [shipping, setShipping] = useState("");
-  const [previewImage, setPreviewImage] = useState<string | null>(null); // Only one image
+  const [previewImage, setPreviewImage] = useState<string[]>([]);
 
   const handleImageUpload = async () => {
     try {
@@ -31,14 +31,14 @@ export default function AddDigitalProduct() {
 
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsMultipleSelection: true,
         aspect: [4, 3],
         quality: 1,
       });
 
-      if (!result.canceled) {
-        // Set the single image for preview
-        setPreviewImage(result.assets[0].uri);
+      if (!result.canceled && result.assets) {
+        const uris = result.assets.map((asset) => asset.uri);
+        setPreviewImage(uris);
       }
     } catch (error) {
       console.log(error);
@@ -78,15 +78,14 @@ export default function AddDigitalProduct() {
       formData.append("quantity", quantity);
       formData.append("box_contents", boxcontent);
       formData.append("shipping_fee", shipping);
-      formData.append("country_free_shipping", ""); // Add the appropriate country ID if needed
-
-      // Convert the image URI to Blob and append it
-      if (previewImage) {
-        const response = await fetch(previewImage);
-        const blob = await response.blob();
-        const fileName = previewImage.split("/").pop();
-        formData.append("fileuploader-list-preview", blob, fileName); // Append the Blob (single image)
-      }
+      formData.append("country_free_shipping", "");
+      previewImage.forEach((imageUri, index) => {
+        formData.append(`fileuploader-list-preview[]`, {
+          uri: imageUri,
+          type: "image/jpeg",
+          name: imageUri.split("/").pop() || `image_${index}.jpg`,
+        } as any);
+      });
 
       // Make the POST request with the Authorization token and form data
       const response = await axios.post(
@@ -134,12 +133,15 @@ export default function AddDigitalProduct() {
           <TextWrapper>Upload Image</TextWrapper>
           <AntDesign name="upload" size={20} color={Colors.black} />
         </TouchableOpacity>
-        {previewImage && (
-          <Image
-            source={{ uri: previewImage }}
-            style={tw`h-40 w-40 rounded-lg mt-4`}
-          />
-        )}
+        <ScrollView horizontal>
+          {previewImage.map((imageUri, index) => (
+            <Image
+              key={index}
+              source={{ uri: imageUri }}
+              style={tw`h-40 w-40 mr-2 rounded-lg`}
+            />
+          ))}
+        </ScrollView>
       </View>
 
       {/* Product Name */}

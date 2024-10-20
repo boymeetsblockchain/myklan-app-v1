@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
 import tw from "twrnc";
 import { useGetDashboardData } from "../../../services/dashboard/queries";
 import { TextWrapper, TextWrapperWhite } from "../../../components/textwrapper";
@@ -20,7 +20,7 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <View style={tw`flex-1 bg-white justify-center`}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#0000" />
       </View>
     );
   }

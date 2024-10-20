@@ -1,18 +1,28 @@
-import { View, ActivityIndicator, Pressable, FlatList } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  ActivityIndicator,
+  Pressable,
+  FlatList,
+  Alert,
+} from "react-native";
 import { TextWrapper, TextWrapperWhite } from "../../../components/textwrapper";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useGetUserProfile } from "../../../services/profile/queries";
+import * as ImagePicker from "expo-image-picker";
 import { Image } from "react-native";
 import tw from "twrnc";
 import { Link } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { ProfilePosts } from "../../../components/profile/ProfilePost";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Dashboard() {
   const { data: profile, isLoading } = useGetUserProfile();
+  const [loadingImage, setLoadingImage] = useState<boolean>(false);
 
-  // Convert date to a more readable format
   const formatDate = (dateString: Date | string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, {
@@ -22,7 +32,108 @@ export default function Dashboard() {
     });
   };
 
-  if (isLoading) {
+  const handleProfileImageChange = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "Permission to access media is required."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const token = await AsyncStorage.getItem("authToken");
+      const formData = new FormData();
+      const image = result.assets[0].uri;
+      formData.append("avatar", {
+        uri: image,
+        type: "image/jpeg",
+        name: "profile.jpg",
+      } as any);
+
+      try {
+        setLoadingImage(true);
+        const response = await axios.post(
+          "https://api.myklan.africa/public/api/upload/avatar",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        Alert.alert("Success", "Profile image updated successfully!");
+      } catch (error) {
+        console.error("Error updating profile image:", error);
+        Alert.alert("Error", "Failed to update profile image.");
+      } finally {
+        setLoadingImage(false);
+      }
+    }
+  };
+
+  const handleCoverImageChange = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "Permission to access media is required."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const token = await AsyncStorage.getItem("authToken");
+      const image = result.assets[0].uri;
+      const formData = new FormData();
+      formData.append("cover", {
+        uri: image,
+        type: "image/jpeg",
+        name: "cover.jpg",
+      } as any);
+
+      try {
+        setLoadingImage(true);
+        const response = await axios.post(
+          "https://api.myklan.africa/public/api/upload/cover",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        Alert.alert("Success", "Cover image updated successfully!");
+      } catch (error) {
+        console.error("Error updating cover image:", error);
+        Alert.alert("Error", "Failed to update cover image.");
+      } finally {
+        setLoadingImage(false);
+      }
+    }
+  };
+
+  if (isLoading || loadingImage) {
     return (
       <View style={tw`flex-1 items-center justify-center `}>
         <ActivityIndicator color={"black"} size={"large"} />
@@ -41,15 +152,14 @@ export default function Dashboard() {
             }}
             style={tw`w-full h-20`}
           />
-          {/* Change Cover Image Button */}
           <Pressable
+            onPress={handleCoverImageChange} // Change cover image
             style={tw`absolute bottom-0 left-0 flex-row gap-x-2 items-center bg-black py-2 px-3 rounded-full`}
           >
             <MaterialIcons name="camera-alt" size={20} color="white" />
           </Pressable>
         </View>
 
-        {/* Profile Image and Details */}
         <View style={tw`px-4 -mt-12`}>
           <View style={tw`flex-col items-center relative`}>
             {/* Profile Image */}
@@ -60,8 +170,9 @@ export default function Dashboard() {
                 }}
                 style={tw`w-24 h-24 rounded-full border-4 border-black`}
               />
-              {/* Edit Profile Image Button */}
+
               <Pressable
+                onPress={handleProfileImageChange} // Change profile image
                 style={tw`absolute bottom-0 right-8 bg-gray-800 p-1 rounded-full opacity-90`}
               >
                 <MaterialIcons name="camera-alt" size={20} color="white" />
@@ -106,7 +217,6 @@ export default function Dashboard() {
             {/* Member Since */}
             <View style={tw`flex-row items-center gap-x-2 mt-2`}>
               <FontAwesome5 name="calendar-alt" size={20} color="black" />
-
               {profile?.user.date && (
                 <TextWrapper style={tw`text-base`}>
                   Member since {formatDate(profile?.user.date)}
@@ -121,6 +231,8 @@ export default function Dashboard() {
           </View>
         </View>
       </View>
+
+      {/* User Posts Section */}
       <View style={tw`flex-1`}>
         <FlatList
           data={profile?.updates.data}
