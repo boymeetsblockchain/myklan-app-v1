@@ -13,6 +13,7 @@ import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import tw from "twrnc";
+import { BackButton } from "../../components/back";
 
 interface Message {
   id: number;
@@ -140,23 +141,25 @@ export default function MessagePage() {
     const isCurrentUser = currentUserId === item.from_user_id;
 
     return (
-      <View
-        style={[
-          tw`flex-row mb-2`,
-          isCurrentUser ? tw`justify-end` : tw`justify-start`,
-        ]}
-      >
+      <View>
         <View
           style={[
-            tw`max-w-4/5 p-3 rounded-lg`,
-            isCurrentUser ? tw`bg-black` : tw`bg-gray-200`,
+            tw`flex-row mb-2`,
+            isCurrentUser ? tw`justify-end` : tw`justify-start`,
           ]}
         >
-          <Text
-            style={tw`text-sm ${isCurrentUser ? "text-white" : "text-black"}`}
+          <View
+            style={[
+              tw`max-w-4/5 p-3 rounded-lg`,
+              isCurrentUser ? tw`bg-black` : tw`bg-gray-200`,
+            ]}
           >
-            {item.message}
-          </Text>
+            <Text
+              style={tw`text-sm ${isCurrentUser ? "text-white" : "text-black"}`}
+            >
+              {item.message}
+            </Text>
+          </View>
         </View>
       </View>
     );
@@ -170,6 +173,7 @@ export default function MessagePage() {
       >
         {/* Message List */}
         <View style={tw`flex-1 p-4`}>
+          <BackButton />
           {loading ? (
             <ActivityIndicator size="large" color="#ffde59" />
           ) : error ? (

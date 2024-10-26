@@ -15,36 +15,31 @@ interface NotificationProps {
   date: string;
 }
 
-const NotificationItem = ({
+// NotificationItem Component
+const NotificationItem: React.FC<NotificationProps> = ({
   avatar,
   username,
   description,
   date,
-}: NotificationProps) => (
+}) => (
   <View
-    style={tw`bg-white p-2 rounded-lg mb-2 shadow-md border border-gray-300`} // Reduced padding and margin
+    style={tw`bg-white p-2 rounded-lg mb-2 shadow-md border border-gray-300`}
   >
     <View style={tw`flex-row items-center mb-1`}>
       <Image
         source={{
           uri: `https://myklan.africa/public/uploads/avatar/${avatar}`,
         }}
-        style={tw`w-8 h-8 rounded-full border border-gray-300`} // Smaller avatar (reduced to 32x32 pixels)
+        style={tw`w-8 h-8 rounded-full border border-gray-300`}
       />
       <View style={tw`ml-2 flex-1`}>
         <TextWrapper fontWeight="bold" textSize="sm">
-          {" "}
-          {/* Reduced text size */}
           {username}
         </TextWrapper>
         <TextWrapper style={tw`text-gray-600 text-xs`}>
-          {" "}
-          {/* Smaller description text */}
           {description}
         </TextWrapper>
         <TextWrapper style={tw`text-gray-400 text-[10px] mt-0.5`}>
-          {" "}
-          {/* Smallest size for date */}
           {TimeAgo(date)}
         </TextWrapper>
       </View>
@@ -52,30 +47,26 @@ const NotificationItem = ({
   </View>
 );
 
-export default function NotificationsScreen() {
+// NotificationsScreen Component
+const NotificationsScreen: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const focused = useIsFocused();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const fetchNotifications = async () => {
+      setLoading(true);
       try {
         const token = await AsyncStorage.getItem("authToken");
-        if (!token) {
-          throw new Error("No auth token found");
-        }
+        if (!token) throw new Error("No auth token found");
 
         const response = await axios.get(
           "http://api.myklan.africa/public/api/notifications",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setNotifications(response.data.data.data);
-        setError(null); // Reset error state if data is successfully fetched
+        setError(null);
       } catch (err: any) {
         console.error(err);
         setError(err.message);
@@ -84,15 +75,13 @@ export default function NotificationsScreen() {
       }
     };
 
-    if (focused) {
-      fetchNotifications();
-    }
-  }, [focused]);
+    if (isFocused) fetchNotifications();
+  }, [isFocused]);
 
   if (loading) {
     return (
       <View style={tw`flex-1 bg-white justify-center items-center`}>
-        <ActivityIndicator size="large" color="#000000" />
+        <ActivityIndicator size="large" color="#000" />
       </View>
     );
   }
@@ -118,8 +107,10 @@ export default function NotificationsScreen() {
           />
         )}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={tw`px-3 pb-4`} // Adjusted padding for thinner view
+        contentContainerStyle={tw`px-3 pb-4`}
       />
     </View>
   );
-}
+};
+
+export default NotificationsScreen;

@@ -9,6 +9,8 @@ import IconButton from "./IconButton";
 import { TimeAgo } from "../timeago";
 import ImageViewer from "react-native-image-zoom-viewer"; // Assuming you have this package
 import { useRouter } from "expo-router"; // Use this hook for router navigation
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 export const Post = ({ post }: { post: PostProp }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -22,6 +24,50 @@ export const Post = ({ post }: { post: PostProp }) => {
 
   const closeImageModal = () => {
     setModalVisible(false);
+  };
+  const getToken = async () => {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("No token found");
+    }
+    return token;
+  };
+
+  const likePost = async () => {
+    try {
+      const token = await getToken();
+      const response = await axios.post(
+        `https://api.myklan.africa/public/api/like/post/${post.id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Post liked successfully", response.data);
+      alert("Post Liked");
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
+  const bookMarkPost = async () => {
+    try {
+      const token = await getToken();
+      const response = await axios.post(
+        `https://api.myklan.africa/public/api/add/bookmark/${post.id}:`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Post liked successfully", response.data);
+      alert("Post bookmarked");
+    } catch (error) {
+      console.error("Error boomakrking post:", error);
+    }
   };
 
   // Transform media into a format suitable for ImageViewer
@@ -138,10 +184,18 @@ export const Post = ({ post }: { post: PostProp }) => {
           <View style={tw`flex-row my-2 justify-between px-1`}>
             <View style={tw`flex-row gap-x-6`}>
               <IconButton icon="comment" text={post.comments_count} />
-              <IconButton icon="heart" text={post.likes_count} />
+              <IconButton
+                icon="heart"
+                text={post.likes_count}
+                onPress={likePost}
+              />
               <IconButton icon="share-apple" />
             </View>
-            <IconButton icon="tag" text={post.bookmarks_count} />
+            <IconButton
+              icon="tag"
+              text={post.bookmarks_count}
+              onPress={bookMarkPost}
+            />
           </View>
         </View>
       </Pressable>
